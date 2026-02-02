@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  postgres-db:
+    image: postgres:15
+    container_name: habeas_postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - habeas-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  evolution-api:
+    image: atendai/evolution-api:v2.1.1
+    container_name: habeas_evolution
+    environment:
+      AUTHENTICATION_API_KEY: ${EVOLUTION_API_KEY}
+    ports:
+      - "8080:8080"
+    networks:
+      - habeas-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/instance/connectionState/${WA_INSTANCE_NAME}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    volumes:
+      - ./evolution-store:/evolution/store
+
+  admin-app:
+    build: ./admin-app
+    container_name: habeas_admin
+    ports:
+      - "8501:8501"
+    env_file: .env
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - habeas-net
+
+  fastapi-landing:
+    build: ./fastapi-landing
+    container_name: habeas_landing
+    ports:
+      - "8000:8000"
+    env_file: .env
+    depends_on:
+      - postgres-db
+    networks:
+      - habeas-net
+
+networks:
+  habeas-net:
+    driver: bridge

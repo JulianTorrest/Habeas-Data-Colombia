@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block content %}
+    <h1 style="color: #28a745;">Ya estás autorizado</h1>
+    <p>Hola <strong>{{ name }}</strong>, ya habíamos recibido tu aceptación el día {{ accepted_at.strftime('%Y-%m-%d') }}.</p>
+    <p>No es necesario que realices ninguna acción adicional.</p>
+    
+    {% if allow_revoke %}
+    <div style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
+        <p style="font-size: 0.9rem;">¿Deseas revocar tu autorización?</p>
+        <form method="post" action="/auth/{token}">
+            <button type="submit" name="decision" value="reject" class="btn btn-reject" style="font-size: 0.9rem; padding: 8px 16px;" formnovalidate>REVOCAR PERMISO</button>
+        </form>
+    </div>
+    {% endif %}
+    <div class="footer">ID Transacción: {{ token }}</div>
+{% endblock %}

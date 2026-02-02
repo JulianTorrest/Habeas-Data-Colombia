@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+{% block content %}
+    <!-- Identidad del Responsable -->
+    <div style="margin-bottom: 20px;">
+        <h2 style="color: #004085; margin: 0;">CAMACOL</h2>
+        <small style="color: #666;">Cámara Colombiana de la Construcción | NIT: 860.009.678-1</small>
+    </div>
+
+    <h1>Hola, {{ name }}</h1>
+
+    {% if error %}
+    <div class="alert">{{ error }}</div>
+    {% endif %}
+
+    <p>Para continuar brindándote información relevante sobre el sector, necesitamos actualizar tu autorización de tratamiento de datos personales.</p>
+    
+    <!-- Filtro de Edad y Contexto -->
+    <p style="font-size: 0.85rem; color: #555; background-color: #eef; padding: 10px; border-radius: 5px;">
+        <strong>Nota Importante:</strong> Este formulario está dirigido exclusivamente a <strong>personas mayores de edad</strong> que hayan adquirido vivienda o estén en proceso de compra en Colombia. Si no cumples con este requisito, por favor selecciona "NO ACEPTAR".
+    </p>
+
+    <p>Puedes consultar y descargar las políticas de tratamiento de datos de los responsables:</p>
+    <ul style="text-align: left; font-size: 0.9rem; color: #555;">
+        <li><a href="/static/politica_camacol.pdf" target="_blank" download>Política de Tratamiento de Datos CAMACOL (PDF)</a></li>
+        <li><a href="/static/politica_bolivar.pdf" target="_blank" download>Política de Tratamiento de Datos Constructora Bolívar (PDF)</a></li>
+    </ul>
+    
+    <form method="post" action="/auth/{token}">
+        <!-- Casilla de Verificación (Checkbox) -->
+        <div class="legal-check">
+            <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer;">
+                <input type="checkbox" name="terms_accepted" style="margin-top: 4px; transform: scale(1.2);">
+                <span>
+                    Certifico que soy mayor de edad y <strong>autorizo</strong> de manera previa, expresa e informada a CAMACOL y Constructora Bolívar para el tratamiento de mis datos personales según sus políticas de privacidad.
+                </span>
+            </label>
+        </div>
+
+        <!-- Botones -->
+        <button type="submit" name="decision" value="accept" class="btn btn-accept">ACEPTAR</button>
+        <!-- formnovalidate permite enviar el formulario sin marcar el checkbox si se rechaza -->
+        <button type="submit" name="decision" value="reject" class="btn btn-reject" formnovalidate>NO ACEPTAR</button>
+    </form>
+    <div class="footer">ID Transacción: {{ token }}</div>
+{% endblock %}
